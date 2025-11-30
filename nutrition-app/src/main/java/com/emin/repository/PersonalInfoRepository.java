@@ -1,0 +1,9 @@
+package com.emin.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.emin.entities.PersonalInfo;
+
+public interface PersonalInfoRepository extends JpaRepository<PersonalInfo, String> {
+    
+}
