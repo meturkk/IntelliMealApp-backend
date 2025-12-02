@@ -1,5 +1,7 @@
 package com.emin.dto;
 
+import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +12,8 @@ import lombok.NoArgsConstructor;
 public class DtoPersonalInfo {
     
     private String id;
+    private String userId;
+    private LocalDate date;
     private Integer age;
     private Double weight;
     private Double height;
@@ -24,5 +28,5 @@ public class DtoPersonalInfo {
     private Integer chestSize;
     private Integer armSize;
     private Integer legSize;
-
+    private DtoUser user;
 }

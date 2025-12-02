@@ -1,5 +1,8 @@
 package com.emin.dto;
 
+
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,5 +19,5 @@ public class DtoUser {
     private String email;
     private String password;
     private String role;
-    private DtoPersonalInfo personalInfo;
+    private List<DtoPersonalInfo> personalInfo;
 }

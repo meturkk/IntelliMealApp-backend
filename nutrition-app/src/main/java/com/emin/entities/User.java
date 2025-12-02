@@ -1,44 +1,43 @@
 package com.emin.entities;
 
-import jakarta.annotation.Generated;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import java.util.List;
+
+import org.hibernate.annotations.UuidGenerator;
+
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users") // PostgreSQL çakışmasını önlemek için 'users' olarak kaldı
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
+
     @Id
-    String id;
+    @UuidGenerator
+    private String id;
 
-    @Column
-    String name;
+    @Column(length = 50)
+    private String name;
 
-    @Column
-    String surname;
+    @Column(length = 50)
+    private String surname;
 
-    @Column(unique = true)
-    String phoneNumber;
+    @Column(name = "phone_number", unique = true, length = 20)
+    private String phoneNumber;
 
-    @Column(unique = true)
-    String email;
+    @Column(unique = true, length = 50)
+    private String email;
 
-    @Column
-    String password;    
+    @Column(length = 50)
+    private String password;    
 
-    @Column
-    String role;
+    @Column(length = 10)
+    private String role;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private PersonalInfo personalInfo;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<PersonalInfo> personalInfoRecords; 
 }
