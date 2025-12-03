@@ -1,6 +1,6 @@
 package com.emin.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +13,7 @@ public class DtoPersonalInfo {
     
     private String id;
     private String userId;
-    private LocalDate date;
+    private LocalDateTime date;
     private Integer age;
     private Double weight;
     private Double height;

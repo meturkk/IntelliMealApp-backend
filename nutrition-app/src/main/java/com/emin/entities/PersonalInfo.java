@@ -1,5 +1,5 @@
 package com.emin.entities;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.UuidGenerator;
 
@@ -26,7 +26,7 @@ public class PersonalInfo {
     private String id;
     
     @Column(name = "date", nullable = true) 
-    private LocalDate date;
+    private LocalDateTime date;
 
     @Column(name = "age")
     private Integer age; 

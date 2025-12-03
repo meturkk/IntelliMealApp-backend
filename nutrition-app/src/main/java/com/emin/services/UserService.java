@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,10 +18,19 @@ import com.emin.exceptions.ResourceNotFoundException;
 import com.emin.repository.UserRepositorty;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepositorty userRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
+    }
 
     private DtoUser convertToDto(User user) {
         DtoUser dtoUser = new DtoUser();
@@ -58,6 +71,12 @@ public class UserService {
     public DtoUser createUser(DtoUser dtoUser) {
         User user = new User();
         BeanUtils.copyProperties(dtoUser, user);
+        
+        // Encode password
+        if (user.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        
         User savedUser = userRepository.save(user);
         return convertToDto(savedUser);
     }

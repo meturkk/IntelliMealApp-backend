@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,9 @@ public class PersonalInfoService {
 
         PersonalInfo personalInfo = new PersonalInfo();
         BeanUtils.copyProperties(dtoPersonalInfo, personalInfo, "id", "user", "userId"); 
+        
+        // Set current date and time
+        personalInfo.setDate(LocalDateTime.now());
         
         personalInfo.setUser(user);
 
