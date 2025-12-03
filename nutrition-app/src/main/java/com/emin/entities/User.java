@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "users") // PostgreSQL çakışmasını önlemek için 'users' olarak kaldı
+@Table(name = "users") 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
