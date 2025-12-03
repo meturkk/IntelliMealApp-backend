@@ -28,11 +28,12 @@ public class AuthController {
     public ResponseEntity<DtoAuthResponse> register(@RequestBody DtoUser request) {
 
         DtoUser createdUser = userService.createUser(request);
+        createdUser.setPassword(null);
         
         UserDetails userDetails = userService.loadUserByUsername(createdUser.getEmail());
         
         String jwtToken = jwtService.generateToken(userDetails);
-        return ResponseEntity.ok(new DtoAuthResponse(jwtToken));
+        return ResponseEntity.ok(new DtoAuthResponse(jwtToken, createdUser));
     }
 
     @PostMapping("/authenticate")
@@ -46,6 +47,10 @@ public class AuthController {
         
         UserDetails userDetails = userService.loadUserByUsername(request.getEmail());
         String jwtToken = jwtService.generateToken(userDetails);
-        return ResponseEntity.ok(new DtoAuthResponse(jwtToken));
+        
+        DtoUser user = userService.getUserByEmail(request.getEmail());
+        user.setPassword(null);
+        
+        return ResponseEntity.ok(new DtoAuthResponse(jwtToken, user));
     }
 }

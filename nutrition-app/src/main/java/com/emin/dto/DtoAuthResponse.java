@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DtoAuthResponse {
     private String token;
+    private DtoUser user;
 }

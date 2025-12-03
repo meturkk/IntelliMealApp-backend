@@ -65,7 +65,7 @@ public class PersonalInfoService {
             throw new ResourceNotFoundException("User", "id", userId);
         }
         
-        List<PersonalInfo> entities = personalInfoRepository.findByUserId(userId);
+        List<PersonalInfo> entities = personalInfoRepository.findByUserIdOrderByDateDesc(userId);
 
         return entities.stream()
                 .map(this::convertToDto)
@@ -80,6 +80,9 @@ public class PersonalInfoService {
                 .orElseThrow(() -> new ResourceNotFoundException("PersonalInfo", "id", infoId));
 
         BeanUtils.copyProperties(dtoPersonalInfo, existingInfo, "id", "user", "userId"); 
+        
+        // Update date to now
+        existingInfo.setDate(LocalDateTime.now());
 
         PersonalInfo updatedInfo = personalInfoRepository.save(existingInfo);
         return convertToDto(updatedInfo);

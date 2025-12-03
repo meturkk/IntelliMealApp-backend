@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.emin.entities.PersonalInfo;
 
 public interface PersonalInfoRepository extends JpaRepository<PersonalInfo, String> {
-    List<PersonalInfo> findByUserId(String userId);
+    List<PersonalInfo> findByUserIdOrderByDateDesc(String userId);
 }

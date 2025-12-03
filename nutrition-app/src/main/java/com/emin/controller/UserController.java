@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import com.emin.dto.DtoUser;
 import com.emin.services.UserService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/rest/api/users")
 public class UserController {
@@ -26,6 +28,12 @@ public class UserController {
 
     
     // Read
+    
+    @GetMapping
+    public ResponseEntity<List<DtoUser>> getAllUsers() {
+        List<DtoUser> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
     
     @GetMapping("/{id}")
     public ResponseEntity<DtoUser> getUserById(@PathVariable(name = "id") String id) {

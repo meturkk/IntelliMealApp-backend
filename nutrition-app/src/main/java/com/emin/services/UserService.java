@@ -65,6 +65,20 @@ public class UserService implements UserDetailsService {
         return convertToDto(user);
     }
 
+    public DtoUser getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+        return convertToDto(user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DtoUser> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
     
     // Create
     
@@ -75,6 +89,11 @@ public class UserService implements UserDetailsService {
         // Encode password
         if (user.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        
+        // Set default role
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+            user.setRole("USER");
         }
         
         User savedUser = userRepository.save(user);

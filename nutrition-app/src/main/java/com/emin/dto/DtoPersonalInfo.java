@@ -16,7 +16,7 @@ public class DtoPersonalInfo {
     private LocalDateTime date;
     private Integer age;
     private Double weight;
-    private Double height;
+    private Integer height;
     private String gender;
     private String activityLevel;
     private String dietaryPreference;
@@ -28,5 +28,4 @@ public class DtoPersonalInfo {
     private Integer chestSize;
     private Integer armSize;
     private Integer legSize;
-    private DtoUser user;
 }
