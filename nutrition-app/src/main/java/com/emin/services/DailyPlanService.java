@@ -40,6 +40,7 @@ public class DailyPlanService {
         DailyPlan entity = new DailyPlan();
         entity.setDay(dto.getDay());
         entity.setUser(user);
+        entity.setChecked(dto.getChecked() != null ? dto.getChecked() : false);
         
         if (dto.getDaySummary() != null) {
             entity.setTotalCalories(dto.getDaySummary().getTotalCalories());
@@ -71,6 +72,7 @@ public class DailyPlanService {
     private DtoDailyPlan convertToDto(DailyPlan entity) {
         DtoDailyPlan dto = new DtoDailyPlan();
         dto.setDay(entity.getDay());
+        dto.setChecked(entity.getChecked());
         
         DtoDaySummary summary = new DtoDaySummary();
         summary.setTotalCalories(entity.getTotalCalories());
@@ -101,5 +103,18 @@ public class DailyPlanService {
     public List<DtoDailyPlan> getDailyPlans(String userId) {
         List<DailyPlan> plans = dailyPlanRepository.findByUserId(userId);
         return plans.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<DtoDailyPlan> markAllPlansAsChecked(String userId) {
+        List<DailyPlan> plans = dailyPlanRepository.findByUserId(userId);
+        plans.forEach(plan -> plan.setChecked(true));
+        List<DailyPlan> savedPlans = dailyPlanRepository.saveAll(plans);
+        return savedPlans.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteAllPlans(String userId) {
+        dailyPlanRepository.deleteByUserId(userId);
     }
 }

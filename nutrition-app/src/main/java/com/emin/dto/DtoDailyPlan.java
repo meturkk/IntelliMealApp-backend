@@ -13,6 +13,9 @@ public class DtoDailyPlan {
 
     @JsonProperty("day")
     private Integer day;
+
+    @JsonProperty("checked")
+    private Boolean checked;
     
     @JsonProperty("meals")
     private List<DtoMealRecord> meals;

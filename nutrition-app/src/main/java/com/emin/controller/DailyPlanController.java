@@ -35,4 +35,21 @@ public class DailyPlanController {
         List<DtoDailyPlan> planList = dailyPlanService.getDailyPlans(userId);
         return ResponseEntity.ok(new DtoDailyPlanWrapper(planList));
     }
+
+    // PUT /rest/api/users/{userId}/daily-plans/check-all
+    // Marks all daily plans as checked for the specified user
+
+    @PutMapping("/check-all")
+    public ResponseEntity<DtoDailyPlanWrapper> checkAllDailyPlans(@PathVariable String userId) {
+        List<DtoDailyPlan> updatedPlans = dailyPlanService.markAllPlansAsChecked(userId);
+        return ResponseEntity.ok(new DtoDailyPlanWrapper(updatedPlans));
+    }
+
+    // DELETE /rest/api/users/{userId}/daily-plans
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteAllDailyPlans(@PathVariable String userId) {
+        dailyPlanService.deleteAllPlans(userId);
+        return ResponseEntity.noContent().build();
+    }
 }

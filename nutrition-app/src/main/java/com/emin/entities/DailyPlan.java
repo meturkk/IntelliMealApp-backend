@@ -32,6 +32,9 @@ public class DailyPlan {
     @Column(name = "total_protein")
     private Double totalProteinG; 
 
+    @Column(name = "is_checked")
+    private Boolean checked = false;
+
     // Günlük plana ait tüm öğün kayıtları
     @OneToMany(mappedBy = "dailyPlan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MealRecord> mealRecords; 
