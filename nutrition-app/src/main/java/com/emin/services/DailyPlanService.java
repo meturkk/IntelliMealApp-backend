@@ -101,7 +101,7 @@ public class DailyPlanService {
     
     @Transactional(readOnly = true)
     public List<DtoDailyPlan> getDailyPlans(String userId) {
-        List<DailyPlan> plans = dailyPlanRepository.findByUserId(userId);
+        List<DailyPlan> plans = dailyPlanRepository.findByUserIdOrderByDayAsc(userId);
         return plans.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
@@ -116,5 +116,23 @@ public class DailyPlanService {
     @Transactional
     public void deleteAllPlans(String userId) {
         dailyPlanRepository.deleteByUserId(userId);
+    }
+
+    @Transactional
+    public DtoDailyPlan replaceDailyPlanForDay(String userId, Integer day, DtoDailyPlan dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        DailyPlan existing = dailyPlanRepository.findByUserIdAndDay(userId, day);
+        if (existing != null) {
+            dailyPlanRepository.delete(existing);
+        }
+
+        dto.setDay(day);
+
+        DailyPlan entity = convertToEntity(dto, user);
+        DailyPlan saved = dailyPlanRepository.save(entity);
+
+        return convertToDto(saved);
     }
 }

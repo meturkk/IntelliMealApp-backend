@@ -2,6 +2,10 @@ package com.emin.controller;
 
 import com.emin.dto.DtoDailyPlan;
 import com.emin.dto.DtoDailyPlanWrapper;
+import com.emin.dto.ExternalDietRequest;
+import com.emin.dto.DtoPersonalInfo;
+import com.emin.services.ExternalDietService;
+import com.emin.services.PersonalInfoService;
 import com.emin.services.DailyPlanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +20,12 @@ public class DailyPlanController {
 
     @Autowired
     private DailyPlanService dailyPlanService;
+
+    @Autowired
+    private ExternalDietService externalDietService;
+
+    @Autowired
+    private PersonalInfoService personalInfoService;
 
     // POST /rest/api/users/{userId}/daily-plans
     
@@ -51,5 +61,90 @@ public class DailyPlanController {
     public ResponseEntity<Void> deleteAllDailyPlans(@PathVariable String userId) {
         dailyPlanService.deleteAllPlans(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    // POST /rest/api/users/{userId}/daily-plans/generate
+    @PostMapping("/generate")
+    public ResponseEntity<DtoDailyPlanWrapper> generateAndSaveDailyPlans(
+            @PathVariable String userId,
+            @RequestBody ExternalDietRequest request) {
+        try {
+            java.util.List<DtoDailyPlan> saved = externalDietService.generateAndSave(userId, request);
+            return new ResponseEntity<>(new DtoDailyPlanWrapper(saved), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // POST /rest/api/users/{userId}/daily-plans/generate-from-personal
+    @PostMapping("/generate-from-personal")
+    public ResponseEntity<DtoDailyPlanWrapper> generateFromPersonalInfo(@PathVariable String userId) {
+        try {
+            // remove existing plans for this user before generating new ones
+            dailyPlanService.deleteAllPlans(userId);
+
+            java.util.List<DtoPersonalInfo> infos = personalInfoService.getAllByUserId(userId);
+            if (infos == null || infos.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+            DtoPersonalInfo latest = infos.get(0);
+
+            ExternalDietRequest req = new ExternalDietRequest();
+            req.setAge(latest.getAge());
+            req.setGender(latest.getGender());
+            req.setHeight(latest.getHeight());
+            if (latest.getWeight() != null) {
+                req.setWeight((int) Math.round(latest.getWeight()));
+            }
+            req.setActivityLevel(latest.getActivityLevel());
+            req.setDietPreference(latest.getDietaryPreference());
+            req.setGoal(latest.getGoal());
+            req.setHealthCondition(latest.getHealthCondition());
+            req.setAllergens(java.util.Collections.emptyList());
+            req.setDays(15);
+
+            java.util.List<DtoDailyPlan> saved = externalDietService.generateAndSave(userId, req);
+            return new ResponseEntity<>(new DtoDailyPlanWrapper(saved), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // PUT /rest/api/users/{userId}/daily-plans/{day}
+    // Regenerate a single day's plan by calling external API with days=1 and replacing stored day
+    @PutMapping("/{day}")
+    public ResponseEntity<DtoDailyPlan> regenerateSingleDay(@PathVariable String userId, @PathVariable Integer day) {
+        try {
+            java.util.List<DtoPersonalInfo> infos = personalInfoService.getAllByUserId(userId);
+            if (infos == null || infos.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+            DtoPersonalInfo latest = infos.get(0);
+
+            ExternalDietRequest req = new ExternalDietRequest();
+            req.setAge(latest.getAge());
+            req.setGender(latest.getGender());
+            req.setHeight(latest.getHeight());
+            if (latest.getWeight() != null) req.setWeight((int) Math.round(latest.getWeight()));
+            req.setActivityLevel(latest.getActivityLevel());
+            req.setDietPreference(latest.getDietaryPreference());
+            req.setGoal(latest.getGoal());
+            req.setHealthCondition(latest.getHealthCondition());
+            req.setAllergens(java.util.Collections.emptyList());
+            req.setDays(1); 
+
+            java.util.List<DtoDailyPlan> generated = externalDietService.generate(req);
+            if (generated == null || generated.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+
+            DtoDailyPlan planForDay = generated.get(0);
+            planForDay.setDay(day);
+
+            DtoDailyPlan saved = dailyPlanService.replaceDailyPlanForDay(userId, day, planForDay);
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
