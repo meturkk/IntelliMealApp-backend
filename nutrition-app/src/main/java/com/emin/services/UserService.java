@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +17,9 @@ import com.emin.dto.DtoUser;
 import com.emin.entities.User;
 import com.emin.exceptions.ResourceNotFoundException;
 import com.emin.repository.UserRepositorty;
+import java.time.LocalDateTime;
+import java.util.concurrent.ThreadLocalRandom;
+import com.emin.services.EmailService;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -25,6 +29,9 @@ public class UserService implements UserDetailsService {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -95,9 +102,41 @@ public class UserService implements UserDetailsService {
         if (user.getRole() == null || user.getRole().isEmpty()) {
             user.setRole("USER");
         }
-        
+
+        // generate verification code and expiry
+        String code = String.valueOf(ThreadLocalRandom.current().nextInt(100000, 1000000));
+        user.setVerificationCode(code);
+        user.setVerified(false);
+        user.setVerificationExpiry(LocalDateTime.now().plusMinutes(15));
+
         User savedUser = userRepository.save(user);
+
+        // send verification email (best-effort)
+        if (savedUser.getEmail() != null) {
+            emailService.sendVerificationEmail(savedUser.getEmail(), code);
+        }
+
         return convertToDto(savedUser);
+    }
+
+    public DtoUser verifyEmail(String email, String code) {
+        User existingUser = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+
+        if (existingUser.getVerificationCode() == null || !existingUser.getVerificationCode().equals(code)) {
+            throw new ResourceNotFoundException("Verification", "code", code);
+        }
+
+        if (existingUser.getVerificationExpiry() != null && existingUser.getVerificationExpiry().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Verification code expired");
+        }
+
+        existingUser.setVerified(true);
+        existingUser.setVerificationCode(null);
+        existingUser.setVerificationExpiry(null);
+
+        User updated = userRepository.save(existingUser);
+        return convertToDto(updated);
     }
 
     // Update

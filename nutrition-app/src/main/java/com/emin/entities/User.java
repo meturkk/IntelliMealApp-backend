@@ -2,6 +2,7 @@ package com.emin.entities;
 
 import java.util.Collection;
 import java.util.List;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.security.core.GrantedAuthority;
@@ -44,6 +45,15 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PersonalInfo> personalInfoRecords;
+
+    @Column(name = "verification_code", length = 20)
+    private String verificationCode;
+
+    @Column(name = "verified")
+    private boolean verified = false;
+
+    @Column(name = "verification_expiry")
+    private LocalDateTime verificationExpiry;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -7,4 +7,5 @@ import com.emin.entities.User;
 
 public interface UserRepositorty extends JpaRepository<User, String>{
     Optional<User> findByEmail(String email);
+    Optional<User> findByVerificationCode(String verificationCode);
 }

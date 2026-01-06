@@ -3,6 +3,7 @@ package com.emin.controller;
 import com.emin.dto.DtoAuthRequest;
 import com.emin.dto.DtoAuthResponse;
 import com.emin.dto.DtoUser;
+import com.emin.dto.DtoVerifyRequest;
 import com.emin.security.JwtService;
 import com.emin.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -52,5 +53,12 @@ public class AuthController {
         user.setPassword(null);
         
         return ResponseEntity.ok(new DtoAuthResponse(jwtToken, user));
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<DtoUser> verifyEmail(@RequestBody DtoVerifyRequest request) {
+        DtoUser user = userService.verifyEmail(request.getEmail(), request.getCode());
+        user.setPassword(null);
+        return ResponseEntity.ok(user);
     }
 }

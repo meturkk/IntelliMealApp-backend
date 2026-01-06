@@ -14,7 +14,7 @@ import java.util.List;
 @Service
 public class ExternalDietService {
 
-    private static final String DIET_API_URL = "{external_diet_api_endpoint}";
+    private static final String DIET_API_URL = "https://diet-ai-rag.onrender.com/generate-diet-plan";
 
     @Autowired
     private RestTemplate restTemplate;
