@@ -40,6 +40,9 @@ public class PersonalInfo {
     @Column(name = "weight")
     private Double weight; 
 
+    @Column(name = "target_weight", nullable = true)
+    private Double targetWeight;
+
     @Column(name = "activity_level", length = 30)
     private String activityLevel; 
 

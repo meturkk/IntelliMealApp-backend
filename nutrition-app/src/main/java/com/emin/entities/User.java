@@ -50,10 +50,13 @@ public class User implements UserDetails {
     private String verificationCode;
 
     @Column(name = "verified")
-    private boolean verified = false;
+    private Boolean verified = false;
 
     @Column(name = "verification_expiry")
     private LocalDateTime verificationExpiry;
+
+    @Column(name = "is_received")
+    private Integer isReceived = 0;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

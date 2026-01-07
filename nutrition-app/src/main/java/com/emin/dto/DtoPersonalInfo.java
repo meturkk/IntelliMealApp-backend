@@ -16,6 +16,7 @@ public class DtoPersonalInfo {
     private LocalDateTime date;
     private Integer age;
     private Double weight;
+    private Double targetWeight;
     private Integer height;
     private String gender;
     private String activityLevel;

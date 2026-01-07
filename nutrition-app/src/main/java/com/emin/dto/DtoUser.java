@@ -19,6 +19,7 @@ public class DtoUser {
     private String email;
     private String password;
     private String role;
-    private boolean verified;
+    private Boolean verified;
+    private Integer isReceived;
     private List<DtoPersonalInfo> personalInfo;
 }

@@ -79,10 +79,7 @@ public class PersonalInfoService {
         PersonalInfo existingInfo = personalInfoRepository.findById(infoId)
                 .orElseThrow(() -> new ResourceNotFoundException("PersonalInfo", "id", infoId));
 
-        BeanUtils.copyProperties(dtoPersonalInfo, existingInfo, "id", "user", "userId"); 
-        
-        // Update date to now
-        existingInfo.setDate(LocalDateTime.now());
+        BeanUtils.copyProperties(dtoPersonalInfo, existingInfo, "id", "user", "userId", "date"); 
 
         PersonalInfo updatedInfo = personalInfoRepository.save(existingInfo);
         return convertToDto(updatedInfo);

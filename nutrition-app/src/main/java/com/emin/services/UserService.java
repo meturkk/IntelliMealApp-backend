@@ -103,6 +103,9 @@ public class UserService implements UserDetailsService {
             user.setRole("USER");
         }
 
+        // Set default isReceived
+        user.setIsReceived(0);
+
         // generate verification code and expiry
         String code = String.valueOf(ThreadLocalRandom.current().nextInt(100000, 1000000));
         user.setVerificationCode(code);
