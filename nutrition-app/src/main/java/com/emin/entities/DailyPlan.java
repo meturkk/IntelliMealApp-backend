@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.List;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "daily_plan")
@@ -25,6 +26,9 @@ public class DailyPlan {
 
     @Column(name = "day_number")
     private Integer day; 
+
+    @Column(name = "plan_date")
+    private LocalDate date;
 
     @Column(name = "total_calories")
     private Integer totalCalories; 

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,6 +43,12 @@ public class DailyPlanService {
         entity.setUser(user);
         entity.setChecked(dto.getChecked() != null ? dto.getChecked() : false);
         
+        // Calculate date: today + (day - 1) days
+        if (dto.getDay() != null) {
+            LocalDate planDate = LocalDate.now().plusDays(dto.getDay() - 1);
+            entity.setDate(planDate);
+        }
+        
         if (dto.getDaySummary() != null) {
             entity.setTotalCalories(dto.getDaySummary().getTotalCalories());
             entity.setTotalProteinG(dto.getDaySummary().getTotalProteinG());
@@ -72,6 +79,7 @@ public class DailyPlanService {
     private DtoDailyPlan convertToDto(DailyPlan entity) {
         DtoDailyPlan dto = new DtoDailyPlan();
         dto.setDay(entity.getDay());
+        dto.setDate(entity.getDate());
         dto.setChecked(entity.getChecked());
         
         DtoDaySummary summary = new DtoDaySummary();
