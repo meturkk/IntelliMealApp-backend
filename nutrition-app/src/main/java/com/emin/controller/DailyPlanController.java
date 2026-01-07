@@ -27,6 +27,9 @@ public class DailyPlanController {
     @Autowired
     private PersonalInfoService personalInfoService;
 
+    @Autowired
+    private com.emin.services.UserService userService;
+
     // POST /rest/api/users/{userId}/daily-plans
     
     @PostMapping
@@ -70,6 +73,7 @@ public class DailyPlanController {
             @RequestBody ExternalDietRequest request) {
         try {
             java.util.List<DtoDailyPlan> saved = externalDietService.generateAndSave(userId, request);
+            userService.markAsReceivedMealPlan(userId);
             return new ResponseEntity<>(new DtoDailyPlanWrapper(saved), HttpStatus.CREATED);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -104,6 +108,7 @@ public class DailyPlanController {
             req.setDays(15);
 
             java.util.List<DtoDailyPlan> saved = externalDietService.generateAndSave(userId, req);
+            userService.markAsReceivedMealPlan(userId);
             return new ResponseEntity<>(new DtoDailyPlanWrapper(saved), HttpStatus.CREATED);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

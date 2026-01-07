@@ -162,4 +162,22 @@ public class UserService implements UserDetailsService {
         
         userRepository.delete(user);
     }
+
+    // Mark as received meal plan
+    @Transactional
+    public void markAsReceivedMealPlan(String userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        user.setIsReceived(1);
+        userRepository.save(user);
+    }
+
+    // Mark as completed meal plan
+    @Transactional
+    public void markAsCompletedMealPlan(String userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        user.setIsReceived(2);
+        userRepository.save(user);
+    }
 }

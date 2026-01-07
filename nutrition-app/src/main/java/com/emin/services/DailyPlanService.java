@@ -20,6 +20,8 @@ public class DailyPlanService {
     private DailyPlanRepository dailyPlanRepository;
     @Autowired
     private UserRepositorty userRepository;
+    @Autowired
+    private UserService userService;
 
     @Transactional
     public List<DtoDailyPlan> createDailyPlans(String userId, List<DtoDailyPlan> dtoList) {
@@ -118,6 +120,10 @@ public class DailyPlanService {
         List<DailyPlan> plans = dailyPlanRepository.findByUserId(userId);
         plans.forEach(plan -> plan.setChecked(true));
         List<DailyPlan> savedPlans = dailyPlanRepository.saveAll(plans);
+        
+        // Update user's isReceived to 2
+        userService.markAsCompletedMealPlan(userId);
+        
         return savedPlans.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
