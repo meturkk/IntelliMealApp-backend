@@ -91,7 +91,10 @@ public class DailyPlanController {
             if (infos == null || infos.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
-            DtoPersonalInfo latest = infos.get(0);
+            DtoPersonalInfo latest = infos.stream()
+                .filter(i -> i.getDate() != null)
+                .max(java.util.Comparator.comparing(DtoPersonalInfo::getDate))
+                .orElse(infos.get(0));
 
             ExternalDietRequest req = new ExternalDietRequest();
             req.setAge(latest.getAge());
@@ -131,7 +134,10 @@ public class DailyPlanController {
             if (infos == null || infos.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
-            DtoPersonalInfo latest = infos.get(0);
+            DtoPersonalInfo latest = infos.stream()
+                .filter(i -> i.getDate() != null)
+                .max(java.util.Comparator.comparing(DtoPersonalInfo::getDate))
+                .orElse(infos.get(0));
 
             ExternalDietRequest req = new ExternalDietRequest();
             req.setAge(latest.getAge());
