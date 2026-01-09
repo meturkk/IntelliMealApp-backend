@@ -104,7 +104,14 @@ public class DailyPlanController {
             req.setDietPreference(latest.getDietaryPreference());
             req.setGoal(latest.getGoal());
             req.setHealthCondition(latest.getHealthCondition());
-            req.setAllergens(java.util.Collections.emptyList());
+            
+            String allergensStr = latest.getAllergens();
+            if (allergensStr != null && !allergensStr.trim().isEmpty()) {
+                req.setAllergens(java.util.Arrays.asList(allergensStr.split("\\s*,\\s*")));
+            } else {
+                req.setAllergens(java.util.Collections.emptyList());
+            }
+            
             req.setDays(15);
 
             java.util.List<DtoDailyPlan> saved = externalDietService.generateAndSave(userId, req);
@@ -135,7 +142,14 @@ public class DailyPlanController {
             req.setDietPreference(latest.getDietaryPreference());
             req.setGoal(latest.getGoal());
             req.setHealthCondition(latest.getHealthCondition());
-            req.setAllergens(java.util.Collections.emptyList());
+
+            String allergensStr = latest.getAllergens();
+            if (allergensStr != null && !allergensStr.trim().isEmpty()) {
+                req.setAllergens(java.util.Arrays.asList(allergensStr.split("\\s*,\\s*")));
+            } else {
+                req.setAllergens(java.util.Collections.emptyList());
+            }
+
             req.setDays(1); 
 
             java.util.List<DtoDailyPlan> generated = externalDietService.generate(req);
@@ -150,6 +164,34 @@ public class DailyPlanController {
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // PUT /rest/api/users/{userId}/daily-plans/{day}/update
+    // Manually update a daily plan (especially meals) for a specific day
+    @PutMapping("/{day}/update")
+    public ResponseEntity<DtoDailyPlan> updateDailyPlan(
+            @PathVariable String userId,
+            @PathVariable Integer day,
+            @RequestBody DtoDailyPlan dtoDailyPlan) {
+        
+        DtoDailyPlan updatedPlan = dailyPlanService.replaceDailyPlanForDay(userId, day, dtoDailyPlan);
+        return ResponseEntity.ok(updatedPlan);
+    }
+    
+    // PUT /rest/api/users/{userId}/daily-plans/{day}/meals/{mealType}
+    // Update a specific meal (e.g., breakfast) for a specific day
+    @PutMapping("/{day}/meals/{mealType}")
+    public ResponseEntity<DtoDailyPlan> updateMealForDate(
+            @PathVariable String userId,
+            @PathVariable Integer day,
+            @PathVariable String mealType,
+            @RequestBody com.emin.dto.DtoMealRecord mealRecord) {
+        try {
+            DtoDailyPlan updatedPlan = dailyPlanService.updateMeal(userId, day, mealType, mealRecord);
+            return ResponseEntity.ok(updatedPlan);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); 
         }
     }
 }

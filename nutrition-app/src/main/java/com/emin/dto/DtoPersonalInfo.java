@@ -23,6 +23,7 @@ public class DtoPersonalInfo {
     private String dietaryPreference;
     private String goal;
     private String healthCondition;
+    private String allergens;
     private Integer neckSize;
     private Integer waistSize;
     private Integer hipSize;

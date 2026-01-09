@@ -54,6 +54,9 @@ public class PersonalInfo {
 
     @Column(name = "health_condition", length = 50)
     private String healthCondition; 
+
+    @Column(name = "allergens")
+    private String allergens;
     
     @Column(name = "neck_size", nullable = true)
     private Integer neckSize;

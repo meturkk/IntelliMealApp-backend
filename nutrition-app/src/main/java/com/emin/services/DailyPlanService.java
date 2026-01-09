@@ -149,4 +149,48 @@ public class DailyPlanService {
 
         return convertToDto(saved);
     }
+
+    @Transactional
+    public DtoDailyPlan updateMeal(String userId, Integer day, String mealType, DtoMealRecord mealDto) {
+        DailyPlan plan = dailyPlanRepository.findByUserIdAndDay(userId, day);
+        if (plan == null) {
+            throw new RuntimeException("Plan not found for user " + userId + " on day " + day);
+        }
+
+        List<MealRecord> meals = plan.getMealRecords();
+        if (meals == null) {
+            meals = new java.util.ArrayList<>();
+            plan.setMealRecords(meals);
+        }
+        
+        MealRecord targetMeal = meals.stream()
+                .filter(m -> m.getMealType().equalsIgnoreCase(mealType))
+                .findFirst()
+                .orElse(null);
+
+        if (targetMeal == null) {
+            targetMeal = new MealRecord();
+            targetMeal.setId(UUID.randomUUID().toString());
+            targetMeal.setDailyPlan(plan);
+            targetMeal.setMealType(mealType);
+            meals.add(targetMeal);
+        }
+
+        // Update fields
+        targetMeal.setMealName(mealDto.getMealName());
+        targetMeal.setTotalCalories(mealDto.getTotalCalories());
+        targetMeal.setTotalProteinG(mealDto.getTotalProteinG());
+        targetMeal.setHealthBenefitNote(mealDto.getHealthBenefitNote());
+        targetMeal.setIngredients(mealDto.getIngredients());
+        
+        // Recalculate daily totals
+        int totalCals = meals.stream().mapToInt(m -> m.getTotalCalories() != null ? m.getTotalCalories() : 0).sum();
+        double totalProtein = meals.stream().mapToDouble(m -> m.getTotalProteinG() != null ? m.getTotalProteinG() : 0.0).sum();
+        
+        plan.setTotalCalories(totalCals);
+        plan.setTotalProteinG(totalProtein);
+
+        DailyPlan saved = dailyPlanRepository.save(plan);
+        return convertToDto(saved);
+    }
 }
