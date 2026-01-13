@@ -1,44 +1,90 @@
 package com.emin.entities;
 
-import jakarta.annotation.Generated;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import java.util.Collection;
+import java.util.List;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.UuidGenerator;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users") 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements UserDetails {
+
     @Id
-    String id;
+    @UuidGenerator
+    private String id;
 
-    @Column
-    String name;
+    @Column(length = 50, nullable = false)
+    private String name;
 
-    @Column
-    String surname;
+    @Column(length = 50, nullable = false)
+    private String surname;
 
-    @Column(unique = true)
-    String phoneNumber;
+    @Column(name = "phone_number", unique = true, length = 20)
+    private String phoneNumber;
 
-    @Column(unique = true)
-    String email;
+    @Column(unique = true, length = 50)
+    private String email;
 
-    @Column
-    String password;    
+    @Column(length = 100)
+    private String password;    
 
-    @Column
-    String role;
+    @Column(length = 10)
+    private String role;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private PersonalInfo personalInfo;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<PersonalInfo> personalInfoRecords;
+
+    @Column(name = "verification_code", length = 20)
+    private String verificationCode;
+
+    @Column(name = "verified")
+    private Boolean verified = false;
+
+    @Column(name = "verification_expiry")
+    private LocalDateTime verificationExpiry;
+
+    @Column(name = "is_received")
+    private Integer isReceived = 0;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role != null ? role : "USER"));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

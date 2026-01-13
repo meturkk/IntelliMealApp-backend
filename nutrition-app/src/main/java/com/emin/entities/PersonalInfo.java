@@ -1,11 +1,14 @@
 package com.emin.entities;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.UuidGenerator;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,8 +22,12 @@ import lombok.NoArgsConstructor;
 public class PersonalInfo {
 
     @Id
-    private String userId;
+    @UuidGenerator
+    private String id;
     
+    @Column(name = "date", nullable = true) 
+    private LocalDateTime date;
+
     @Column(name = "age")
     private Integer age; 
 
@@ -33,6 +40,9 @@ public class PersonalInfo {
     @Column(name = "weight")
     private Double weight; 
 
+    @Column(name = "target_weight", nullable = true)
+    private Double targetWeight;
+
     @Column(name = "activity_level", length = 30)
     private String activityLevel; 
 
@@ -44,6 +54,9 @@ public class PersonalInfo {
 
     @Column(name = "health_condition", length = 50)
     private String healthCondition; 
+
+    @Column(name = "allergens")
+    private String allergens;
     
     @Column(name = "neck_size", nullable = true)
     private Integer neckSize;
@@ -63,8 +76,7 @@ public class PersonalInfo {
     @Column(name = "leg_size", nullable = true)
     private Integer legSize;
 
-    @OneToOne
-    @MapsId 
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }
