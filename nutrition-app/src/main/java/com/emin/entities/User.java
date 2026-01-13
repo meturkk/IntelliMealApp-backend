@@ -25,10 +25,10 @@ public class User implements UserDetails {
     @UuidGenerator
     private String id;
 
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String name;
 
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String surname;
 
     @Column(name = "phone_number", unique = true, length = 20)

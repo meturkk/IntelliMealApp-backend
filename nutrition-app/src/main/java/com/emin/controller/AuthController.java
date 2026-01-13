@@ -6,6 +6,7 @@ import com.emin.dto.DtoUser;
 import com.emin.dto.DtoVerifyRequest;
 import com.emin.security.JwtService;
 import com.emin.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,7 +27,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public ResponseEntity<DtoAuthResponse> register(@RequestBody DtoUser request) {
+    public ResponseEntity<DtoAuthResponse> register(@Valid @RequestBody DtoUser request) {
 
         DtoUser createdUser = userService.createUser(request);
         createdUser.setPassword(null);

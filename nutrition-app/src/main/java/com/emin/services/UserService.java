@@ -148,7 +148,13 @@ public class UserService implements UserDetailsService {
     public DtoUser updateUser(String id, DtoUser dtoUser) {
         User existingUser = userRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
-                BeanUtils.copyProperties(dtoUser, existingUser, "id", "personalInfo");
+            
+        // Password hash check
+        if(dtoUser.getPassword() != null && !dtoUser.getPassword().isEmpty()){
+            existingUser.setPassword(passwordEncoder.encode(dtoUser.getPassword()));
+        }
+            
+        BeanUtils.copyProperties(dtoUser, existingUser, "id", "personalInfo", "password");
                 
         User updatedUser = userRepository.save(existingUser);
         return convertToDto(updatedUser);
