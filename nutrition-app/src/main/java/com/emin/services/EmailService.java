@@ -10,7 +10,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${spring.mail.username:}")
+    @Value("${app.mail.from}")
     private String from;
 
     public EmailService(JavaMailSender mailSender) {
@@ -24,7 +24,7 @@ public class EmailService {
             if (from != null && !from.isBlank()) {
                 message.setFrom(from);
             }
-            message.setSubject("Email Doğrulama Kodu");
+            message.setSubject("IntelliMeal Email Doğrulama Kodu");
             message.setText("Doğrulama kodunuz: " + code + "\n\nEğer bu isteği siz yapmadıysanız, bu e-postayı dikkate almayınız.");
             mailSender.send(message);
         } catch (Exception e) {
