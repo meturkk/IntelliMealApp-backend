@@ -19,6 +19,8 @@ import com.emin.exceptions.ResourceNotFoundException;
 import com.emin.repository.UserRepositorty;
 import java.time.LocalDateTime;
 import java.util.concurrent.ThreadLocalRandom;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import com.emin.services.EmailService;
 
 @Service
@@ -131,7 +133,7 @@ public class UserService implements UserDetailsService {
         }
 
         if (existingUser.getVerificationExpiry() != null && existingUser.getVerificationExpiry().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Verification code expired");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Verification code expired");
         }
 
         existingUser.setVerified(true);

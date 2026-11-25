@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +18,16 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    // 256-bit key generated for demo purposes. In production, use an environment variable.
-    private static final String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+    // Base64-encoded 256-bit signing key, supplied via the JWT_SECRET environment variable
+    // (see application.properties). Never commit a real key to the repository.
+    private final String SECRET_KEY;
+
+    public JwtService(@Value("${jwt.secret}") String secretKey) {
+        if (secretKey == null || secretKey.isBlank()) {
+            throw new IllegalStateException("JWT secret is not configured. Set the JWT_SECRET environment variable.");
+        }
+        this.SECRET_KEY = secretKey;
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
